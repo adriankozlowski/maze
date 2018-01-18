@@ -4,12 +4,9 @@ import java.util.PriorityQueue;
 
 public class Main {
     public static void main(String[] args) {
-        MazeGenerator generator = new MazeGenerator();
-        Maze maze = generator.generateMiniMaze();
-        maze.print();
+        MazeGenerator generator = new MazeGenerator(10, 20);
+        generator.display();
 
-        solve(maze);
-        maze.print();
     }
 
     private static void solve(Maze maze) {

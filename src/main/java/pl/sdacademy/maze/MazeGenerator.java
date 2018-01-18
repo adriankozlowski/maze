@@ -8,41 +8,19 @@ import java.util.Collections;
  * http://weblog.jamisbuck.org/2010/12/27/maze-generation-recursive-backtracking
  */
 public class MazeGenerator {
-    private int x;
-    private int y;
-    private int[][] maze;
+    private final int x;
+    private final int y;
+    private final int[][] maze;
 
-    public MazeGenerator() {
-    }
-
-    public Maze generateMiniMaze() {
-        initialize(4, 4);
-        generateMaze(0, 0);
-        return convertMaze();
-    }
-
-    public Maze generateSmallMaze() {
-        initialize(10, 10);
-        generateMaze(0, 0);
-        return convertMaze();
-    }
-
-    public Maze generateMediumMaze() {
-        initialize(20, 20);
-        generateMaze(0, 0);
-        return convertMaze();
-    }
-
-    public Maze generateLargeMaze() {
-        initialize(40, 40);
-        generateMaze(0, 0);
-        return convertMaze();
-    }
-
-    private void initialize(int x, int y) {
+    public MazeGenerator(int x, int y) {
         this.x = x;
         this.y = y;
         maze = new int[this.x][this.y];
+        generateMaze(0, 0);
+    }
+
+    private static boolean between(int v, int upper) {
+        return (v >= 0) && (v < upper);
     }
 
     private void generateMaze(int cx, int cy) {
@@ -59,44 +37,41 @@ public class MazeGenerator {
         }
     }
 
-    private boolean between(int v, int upper) {
-        return (v >= 0) && (v < upper);
+    public static void main(String[] args) {
+        int x = args.length >= 1 ? (Integer.parseInt(args[0])) : 8;
+        int y = args.length == 2 ? (Integer.parseInt(args[1])) : 8;
+        MazeGenerator maze = new MazeGenerator(x, y);
+        maze.display();
     }
 
-    private Maze convertMaze() {
-        MazeElement[][] elements = new MazeElement[y * 2 + 1][x * 2 + 1];
+    public void display() {
         for (int i = 0; i < y; i++) {
+            // draw the north edge
             for (int j = 0; j < x; j++) {
-                if ((maze[j][i] & 1) == 0) {
-                    elements[i * 2][j * 2] = new MazeElement('#', i * 2, j * 2);
-                    elements[i * 2][j * 2 + 1] = new MazeElement('#', i * 2, j * 2 + 1);
-                } else {
-                    elements[i * 2][j * 2] = new MazeElement('#', i * 2, j * 2);
-                    elements[i * 2][j * 2 + 1] = new MazeElement(' ', i * 2, j * 2 + 1);
-                }
+                System.out.print((maze[j][i] & 1) == 0 ? "+---" : "+   ");
             }
-            elements[i * 2][x * 2] = new MazeElement('#', i * 2, x * 2);
+            System.out.println("+");
+            // draw the west edge
             for (int j = 0; j < x; j++) {
-                if ((maze[j][i] & 8) == 0) {
-                    elements[i * 2 + 1][j * 2] = new MazeElement('#', i * 2 + 1, j * 2);
-                    elements[i * 2 + 1][j * 2 + 1] = new MazeElement(' ', i * 2 + 1, j * 2 + 1);
-                } else {
-                    elements[i * 2 + 1][j * 2] = new MazeElement(' ', i * 2 + 1, j * 2);
-                    elements[i * 2 + 1][j * 2 + 1] = new MazeElement(' ', i * 2 + 1, j * 2 + 1);
-                }
+                System.out.print((maze[j][i] & 8) == 0 ? "|   " : "    ");
             }
-            elements[i * 2 + 1][x * 2] = new MazeElement('#', i * 2 + 1, x * 2);
+            System.out.println("|");
         }
+        // draw the bottom line
         for (int j = 0; j < x; j++) {
-            elements[y * 2][j * 2] = new MazeElement('#', y * 2, j * 2);
-            elements[y * 2][j * 2 + 1] = new MazeElement('#', y * 2, j * 2 + 1);
+            System.out.print("+---");
         }
-        elements[y * 2][x * 2] = new MazeElement('#', y * 2, x * 2);
-        return new Maze(elements);
+        System.out.println("+");
     }
+
+    ;
 
     private enum DIR {
         N(1, 0, -1), S(2, 0, 1), E(4, 1, 0), W(8, -1, 0);
+        private final int bit;
+        private final int dx;
+        private final int dy;
+        private DIR opposite;
 
         // use the static initializer to resolve forward references
         static {
@@ -106,18 +81,10 @@ public class MazeGenerator {
             W.opposite = E;
         }
 
-        private final int bit;
-        private final int dx;
-        private final int dy;
-        private DIR opposite;
-
         private DIR(int bit, int dx, int dy) {
             this.bit = bit;
             this.dx = dx;
             this.dy = dy;
         }
     }
-
-    ;
-
 }
